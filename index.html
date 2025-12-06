@@ -3,274 +3,1261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulasi FSA E-commerce - Sistem Pelacakan Pesanan</title>
-    <link rel="stylesheet" href="styles.css">
-    
-    <!-- SweetAlert2 -->
+    <title>Sistem E-commerce - Validasi FSA</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- Viz.js for Diagram -->
-    <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/viz.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/viz.js@2.1.2/full.render.js"></script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 240, 255, 0.2); }
+            50% { box-shadow: 0 0 15px rgba(0, 240, 255, 0.3); }
+        }
+        
+        @keyframes neonPulse {
+            0%, 100% { filter: drop-shadow(0 0 2px currentColor); }
+            50% { filter: drop-shadow(0 0 5px currentColor); }
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0e27;
+            background-image: 
+                radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(0, 240, 255, 0.1) 0%, transparent 50%);
+            min-height: 100vh;
+            padding: 1rem;
+            color: #e0e7ff;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(15, 20, 25, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            border-bottom: 2px solid rgba(0, 240, 255, 0.3);
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 50%, rgba(0, 240, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 50%, rgba(0, 255, 159, 0.1) 0%, transparent 50%);
+            opacity: 0.5;
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: #00f0ff;
+            position: relative;
+            z-index: 1;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+        }
+        
+        .header h1 i {
+            color: #00ff9f;
+            margin-right: 0.5rem;
+        }
+        
+        .header p {
+            font-size: 0.95rem;
+            color: #a5b4fc;
+            position: relative;
+            z-index: 1;
+            font-weight: 400;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+        
+        .sidebar {
+            background: rgba(10, 14, 39, 0.8);
+            border-right: 2px solid rgba(0, 240, 255, 0.2);
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+        
+        .content-area {
+            padding: 2rem;
+            background: rgba(15, 20, 25, 0.5);
+        }
+        
+        .menu-item {
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+            color: #a5b4fc;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 3px;
+            background: #00f0ff;
+            transform: scaleY(0);
+            transition: transform 0.3s;
+        }
+        
+        .menu-item:hover {
+            background: rgba(0, 240, 255, 0.1);
+            border-color: rgba(0, 240, 255, 0.3);
+            transform: translateX(5px);
+        }
+        
+        .menu-item:hover::before {
+            transform: scaleY(1);
+        }
+        
+        .menu-item.active {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(0, 255, 159, 0.2));
+            color: #00f0ff;
+            border-color: #00f0ff;
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+        }
+        
+        .menu-item.active::before {
+            transform: scaleY(1);
+        }
+        
+        .menu-item i {
+            font-size: 1.2rem;
+            width: 24px;
+            filter: drop-shadow(0 0 5px currentColor);
+        }
+        
+        .section {
+            background: rgba(26, 31, 46, 0.6);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.5s ease;
+            transition: all 0.3s;
+        }
+        
+        .section:hover {
+            border-color: rgba(139, 92, 246, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .section h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #00f0ff;
+            font-size: 1.2rem;
+        }
+        
+        .section h3 i {
+            color: #00ff9f;
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .input-group input,
+        .input-group select {
+            flex: 1;
+            padding: 0.75rem;
+            border: 2px solid rgba(99, 102, 241, 0.3);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            background: rgba(10, 14, 39, 0.8);
+            color: #e0e7ff;
+            transition: all 0.3s;
+        }
+        
+        .input-group input::placeholder {
+            color: #6366f1;
+        }
+        
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+            background: rgba(139, 92, 246, 0.05);
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00f0ff 0%, #00b8d4 100%);
+            color: #0a0e27;
+            border-color: transparent;
+            font-weight: 700;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #00b8d4 0%, #0097a7 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 240, 255, 0.4);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border-color: transparent;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+        }
+        
+        .order-card {
+            background: rgba(26, 31, 46, 0.6);
+            padding: 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border: 2px solid;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .order-card:nth-child(odd) {
+            border-color: rgba(0, 240, 255, 0.3);
+        }
+        
+        .order-card:nth-child(even) {
+            border-color: rgba(0, 255, 159, 0.3);
+        }
+        
+        .order-card:nth-child(3n) {
+            border-color: rgba(251, 191, 36, 0.3);
+        }
+        
+        .order-card:hover {
+            transform: translateX(8px);
+        }
+        
+        .order-card:nth-child(odd):hover {
+            border-color: #00f0ff;
+            box-shadow: 0 5px 20px rgba(0, 240, 255, 0.3);
+        }
+        
+        .order-card:nth-child(even):hover {
+            border-color: #00ff9f;
+            box-shadow: 0 5px 20px rgba(0, 255, 159, 0.3);
+        }
+        
+        .order-card:nth-child(3n):hover {
+            border-color: #fbbf24;
+            box-shadow: 0 5px 20px rgba(251, 191, 36, 0.3);
+        }
+        
+        .order-card.selected {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .order-id {
+            font-size: 1.3rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            background: rgba(0, 240, 255, 0.1);
+            border-radius: 6px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+        
+        .order-card:nth-child(odd) .order-id {
+            color: #00f0ff;
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+        }
+        
+        .order-card:nth-child(even) .order-id {
+            color: #00ff9f;
+            text-shadow: 0 0 8px rgba(0, 255, 159, 0.6);
+        }
+        
+        .order-card:nth-child(3n) .order-id {
+            color: #fbbf24;
+            text-shadow: 0 0 8px rgba(251, 191, 36, 0.6);
+        }
+        
+        .order-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            color: #a5b4fc;
+        }
+        
+        .order-detail:last-child {
+            border-bottom: none;
+        }
+        
+        .order-detail strong {
+            color: #e0e7ff;
+        }
+        
+        .order-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-top: 0.5rem;
+        }
+        
+        .status-pending {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.4);
+        }
+        
+        .status-paid {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+        }
+        
+        .status-processing {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+            border: 1px solid rgba(139, 92, 246, 0.4);
+        }
+        
+        .status-shipped {
+            background: rgba(0, 240, 255, 0.2);
+            color: #00f0ff;
+            border: 1px solid rgba(0, 240, 255, 0.4);
+        }
+        
+        .status-delivered {
+            background: rgba(0, 255, 159, 0.2);
+            color: #00ff9f;
+            border: 1px solid rgba(0, 255, 159, 0.4);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            animation: slideIn 0.5s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 2px solid #10b981;
+            color: #34d399;
+        }
+        
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid #ef4444;
+            color: #f87171;
+        }
+        
+        .alert-info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 2px solid #3b82f6;
+            color: #60a5fa;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(26, 31, 46, 0.6);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 2px solid;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.5s ease;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:nth-child(1) {
+            border-color: #00f0ff;
+        }
+        
+        .stat-card:nth-child(2) {
+            border-color: #fbbf24;
+        }
+        
+        .stat-card:nth-child(3) {
+            border-color: #00ff9f;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card:nth-child(1):hover {
+            box-shadow: 0 5px 20px rgba(0, 240, 255, 0.4);
+        }
+        
+        .stat-card:nth-child(2):hover {
+            box-shadow: 0 5px 20px rgba(251, 191, 36, 0.4);
+        }
+        
+        .stat-card:nth-child(3):hover {
+            box-shadow: 0 5px 20px rgba(0, 255, 159, 0.4);
+        }
+        
+        .stat-card:nth-child(1) .stat-value {
+            color: #00f0ff;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+        }
+        
+        .stat-card:nth-child(2) .stat-value {
+            color: #fbbf24;
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.6);
+        }
+        
+        .stat-card:nth-child(3) .stat-value {
+            color: #00ff9f;
+            text-shadow: 0 0 10px rgba(0, 255, 159, 0.6);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #a5b4fc;
+            font-size: 0.9rem;
+        }
+        
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        code {
+            background: rgba(0, 240, 255, 0.15);
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            color: #00f0ff;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 1.05em;
+            border: 1px solid rgba(0, 240, 255, 0.4);
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+            animation: fadeIn 1s ease;
+        }
+        
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+            color: #00f0ff;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(10, 14, 39, 0.5);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 240, 255, 0.5);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 240, 255, 0.8);
+        }
+        
+        /* SweetAlert2 Custom Styling */
+        .swal2-popup {
+            border: 2px solid rgba(0, 240, 255, 0.3) !important;
+            box-shadow: 0 0 40px rgba(0, 240, 255, 0.3) !important;
+        }
+        
+        .swal2-title {
+            color: #00f0ff !important;
+        }
+        
+        .swal2-html-container {
+            color: #e0e7ff !important;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 2px solid #e9ecef;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-shopping-cart"></i>
-                    <h1>Simulasi FSA E-commerce</h1>
-                </div>
-                <div class="header-subtitle">
-                    <p>Sistem Pemodelan Workflow Pesanan menggunakan Finite State Automata</p>
-                    <span class="badge">Teori Bahasa dan Automata</span>
-                </div>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shopping-cart"></i> Sistem E-commerce</h1>
+            <p>Dengan Validasi ID Pesanan menggunakan Finite State Automata</p>
         </div>
-    </header>
-
-    <!-- Main Container -->
-    <div class="container main-container">
         
-        <!-- Control Panel -->
-        <div class="control-panel">
-            <div class="panel-header">
-                <h2><i class="fas fa-sliders-h"></i> Panel Kontrol</h2>
+        <div class="main-content">
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+                <div class="menu-item active" onclick="showPage('dashboard')">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="menu-item" onclick="showPage('create')">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Buat Pesanan</span>
+                </div>
+                <div class="menu-item" onclick="showPage('orders')">
+                    <i class="fas fa-list"></i>
+                    <span>Daftar Pesanan</span>
+                </div>
+                <div class="menu-item" onclick="showPage('check')">
+                    <i class="fas fa-search"></i>
+                    <span>Cek Pesanan</span>
+                </div>
             </div>
             
-            <!-- Mode Selection -->
-            <div class="mode-selection">
-                <button class="mode-btn active" data-mode="manual">
-                    <i class="fas fa-hand-pointer"></i>
-                    <span>Mode Manual</span>
-                </button>
-                <button class="mode-btn" data-mode="simulasi">
-                    <i class="fas fa-play-circle"></i>
-                    <span>Mode Simulasi</span>
-                </button>
-                <button class="mode-btn" data-mode="pengujian">
-                    <i class="fas fa-flask"></i>
-                    <span>Mode Pengujian</span>
-                </button>
-            </div>
-
-            <!-- Manual Mode -->
-            <div class="mode-content" id="manualMode">
-                <div class="section">
-                    <h3><i class="fas fa-plus-circle"></i> Buat Pesanan Baru</h3>
-                    <div class="input-group">
-                        <input type="text" id="namaPelanggan" placeholder="Nama Pelanggan" value="Budi Santoso">
-                        <button id="buatPesanan" class="btn btn-primary">
+            <!-- CONTENT AREA -->
+            <div class="content-area">
+                <!-- PAGE: DASHBOARD -->
+                <div id="dashboard" class="page active">
+                    <h2 style="margin-bottom: 1.5rem;">Dashboard</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalOrders">0</div>
+                            <div class="stat-label">Total Pesanan</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="pendingOrders">0</div>
+                            <div class="stat-label">Pending</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="deliveredOrders">0</div>
+                            <div class="stat-label">Selesai</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section">
+                        <h3><i class="fas fa-info-circle"></i> Tentang Sistem</h3>
+                        <p style="line-height: 1.6; color: #a5b4fc;">
+                            Sistem ini menggunakan <strong style="color: #00f0ff;">Finite State Automata (FSA)</strong> untuk memvalidasi format ID pesanan secara otomatis.
+                            Setiap ID pesanan harus mengikuti format: <code>ORD-XXXX-YYYY</code>
+                        </p>
+                        <p style="margin-top: 1rem; line-height: 1.6; color: #a5b4fc;">
+                            FSA bekerja di <strong style="color: #ff00ff;">background</strong> untuk memvalidasi setiap ID yang di-generate atau di-input oleh user.
+                            Jika format tidak sesuai, sistem akan menolak dan memberikan pesan error yang jelas.
+                        </p>
+                    </div>
+                    
+                    <div class="section">
+                        <h3><i class="fas fa-check-circle"></i> Format ID Valid</h3>
+                        <div style="background: rgba(0, 240, 255, 0.05); padding: 1rem; border-radius: 8px; margin-top: 1rem; border: 1px solid rgba(0, 240, 255, 0.2);">
+                            <p style="margin-bottom: 0.5rem; color: #e0e7ff;"><strong>Format:</strong> <code>ORD-XXXX-YYYY</code></p>
+                            <p style="margin-bottom: 0.5rem; color: #a5b4fc;">• <strong style="color: #00f0ff;">ORD</strong> = Prefix (3 huruf kapital)</p>
+                            <p style="margin-bottom: 0.5rem; color: #a5b4fc;">• <strong style="color: #00f0ff;">XXXX</strong> = 4 digit tahun (0-9)</p>
+                            <p style="margin-bottom: 0.5rem; color: #a5b4fc;">• <strong style="color: #00f0ff;">YYYY</strong> = 4 digit nomor urut (0-9)</p>
+                            <p style="margin-top: 1rem; color: #e0e7ff;"><strong>Contoh:</strong> <code>ORD-2024-0001</code>, <code>ORD-2025-9999</code></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- PAGE: BUAT PESANAN -->
+                <div id="create" class="page">
+                    <h2 style="margin-bottom: 1.5rem;">Buat Pesanan Baru</h2>
+                    
+                    <div class="section">
+                        <h3><i class="fas fa-shopping-cart"></i> Form Pesanan</h3>
+                        
+                        <div class="input-group">
+                            <input type="text" id="customerName" placeholder="Nama Pelanggan" value="Budi Santoso">
+                        </div>
+                        
+                        <div class="input-group">
+                            <input type="text" id="productName" placeholder="Nama Produk" value="Laptop ASUS ROG">
+                        </div>
+                        
+                        <div class="input-group">
+                            <input type="number" id="quantity" placeholder="Jumlah" value="1" min="1">
+                            <input type="number" id="price" placeholder="Harga (Rp)" value="15000000" min="0">
+                        </div>
+                        
+                        <button class="btn btn-success" onclick="createOrder()">
                             <i class="fas fa-plus"></i> Buat Pesanan
                         </button>
                     </div>
-                </div>
-
-                <div class="section">
-                    <h3><i class="fas fa-list"></i> Daftar Pesanan Aktif</h3>
-                    <div id="daftarPesanan" class="pesanan-list">
-                        <div class="empty-state">
-                            <i class="fas fa-inbox"></i>
-                            <p>Belum ada pesanan. Buat pesanan baru untuk memulai!</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="section" id="detailPesananSection" style="display: none;">
-                    <h3><i class="fas fa-info-circle"></i> Detail Pesanan</h3>
-                    <div id="detailPesanan" class="detail-card"></div>
-                </div>
-
-                <div class="section" id="aksiSection" style="display: none;">
-                    <h3><i class="fas fa-bolt"></i> Aksi yang Tersedia</h3>
-                    <div id="tombolAksi" class="action-grid"></div>
-                </div>
-            </div>
-
-            <!-- Simulation Mode -->
-            <div class="mode-content" id="simulasiMode" style="display: none;">
-                <div class="section">
-                    <h3><i class="fas fa-route"></i> Pilih Skenario Simulasi</h3>
-                    <div class="scenario-grid">
-                        <button class="scenario-btn" data-scenario="sukses">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Pesanan Sukses</span>
-                            <small>Happy Path</small>
-                        </button>
-                        <button class="scenario-btn" data-scenario="batal">
-                            <i class="fas fa-times-circle"></i>
-                            <span>Pesanan Dibatalkan</span>
-                            <small>Cancel Flow</small>
-                        </button>
-                        <button class="scenario-btn" data-scenario="refund">
-                            <i class="fas fa-undo"></i>
-                            <span>Refund</span>
-                            <small>Refund Flow</small>
-                        </button>
-                        <button class="scenario-btn" data-scenario="gagal-bayar">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <span>Pembayaran Gagal</span>
-                            <small>Payment Failed</small>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="section">
-                    <h3><i class="fas fa-cog"></i> Pengaturan Simulasi</h3>
-                    <div class="simulation-controls">
-                        <label>
-                            <span>Kecepatan Animasi:</span>
-                            <input type="range" id="kecepatanSimulasi" min="500" max="3000" value="1500" step="100">
-                            <span id="kecepatanLabel">1.5s</span>
-                        </label>
-                        <button id="mulaiSimulasi" class="btn btn-success">
-                            <i class="fas fa-play"></i> Mulai Simulasi
-                        </button>
-                        <button id="stopSimulasi" class="btn btn-danger" style="display: none;">
-                            <i class="fas fa-stop"></i> Stop Simulasi
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Testing Mode -->
-            <div class="mode-content" id="pengujianMode" style="display: none;">
-                <div class="section">
-                    <h3><i class="fas fa-vial"></i> Uji Sequence Aksi</h3>
-                    <p class="help-text">Masukkan urutan aksi (pisahkan dengan koma):</p>
-                    <div class="input-group">
-                        <textarea id="sequenceInput" rows="3" placeholder="Contoh: buat_pesanan,konfirmasi_pembayaran,proses_pesanan"></textarea>
-                    </div>
-                    <button id="validasiSequence" class="btn btn-primary">
-                        <i class="fas fa-check"></i> Validasi Sequence
-                    </button>
-                    <div id="hasilValidasi" class="validation-result"></div>
-                </div>
-
-                <div class="section">
-                    <h3><i class="fas fa-clipboard-list"></i> Contoh Sequence</h3>
-                    <div class="example-sequences">
-                        <button class="example-btn" data-sequence="buat_pesanan,konfirmasi_pembayaran,proses_pesanan,kirim_pesanan,update_pengiriman,pesanan_sampai">
-                            <i class="fas fa-check"></i> Valid: Pesanan Sukses
-                        </button>
-                        <button class="example-btn" data-sequence="buat_pesanan,konfirmasi_pembayaran,batalkan_pesanan">
-                            <i class="fas fa-check"></i> Valid: Dibatalkan
-                        </button>
-                        <button class="example-btn" data-sequence="buat_pesanan,pesanan_sampai">
-                            <i class="fas fa-times"></i> Invalid: Skip State
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Visualization Panel -->
-        <div class="visualization-panel">
-            <!-- State Diagram -->
-            <div class="diagram-section">
-                <div class="section-header">
-                    <h2><i class="fas fa-project-diagram"></i> Diagram State FSA</h2>
-                    <div style="display: flex; gap: 0.5rem;">
-                        <button id="fullscreenDiagram" class="btn-icon" title="Mode Fullscreen">
-                            <i class="fas fa-expand"></i>
-                        </button>
-                        <button id="refreshDiagram" class="btn-icon" title="Refresh Diagram">
-                            <i class="fas fa-sync-alt"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="diagram-wrapper">
-                    <div id="diagramContainer" class="diagram-container">
-                        <div class="loading">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Memuat diagram...</p>
-                        </div>
-                    </div>
                     
-                    <!-- State Info Panel (Draggable) -->
-                    <div class="state-info-panel" id="stateInfoPanel" style="display: none;">
-                        <div class="state-info-header draggable-handle">
-                            <h4><i class="fas fa-info-circle"></i> Informasi State</h4>
-                            <div class="panel-controls">
-                                <button class="panel-control-btn" id="minimizePanel" title="Minimize">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button class="panel-control-btn" id="closePanel" title="Close">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div id="stateInfoContent" class="state-info-content"></div>
-                        <div class="drag-hint">
-                            <i class="fas fa-arrows-alt"></i> Drag untuk memindahkan
-                        </div>
-                    </div>
-                    
-                    <!-- Toggle Button (Floating) -->
-                    <button class="info-panel-toggle-btn" id="infoPanelToggleBtn" style="display: none;" title="Tampilkan Info Panel">
-                        <i class="fas fa-info-circle"></i>
-                    </button>
-                    
-                    <!-- Action Buttons Overlay -->
-                    <div class="diagram-action-buttons" id="diagramActionButtons" style="display: none;"></div>
+                    <div id="createResult"></div>
                 </div>
                 
-                <div class="diagram-legend">
-                    <div class="legend-item">
-                        <span class="legend-dot initial"></span>
-                        <span>State Awal</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot final"></span>
-                        <span>State Akhir</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot active"></span>
-                        <span>State Aktif</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot visited"></span>
-                        <span>Path Dilalui</span>
-                    </div>
+                <!-- PAGE: DAFTAR PESANAN -->
+                <div id="orders" class="page">
+                    <h2 style="margin-bottom: 1.5rem;">Daftar Pesanan</h2>
+                    
+                    <div id="ordersList"></div>
                 </div>
-            </div>
-
-            <!-- History & Statistics -->
-            <div class="info-grid">
-                <!-- History -->
-                <div class="info-section" id="riwayatSection" style="display: none;">
-                    <div class="section-header">
-                        <h3><i class="fas fa-history"></i> Riwayat Transisi</h3>
-                        <button id="clearHistory" class="btn-icon-small" title="Hapus Riwayat">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                
+                <!-- PAGE: CEK PESANAN -->
+                <div id="check" class="page">
+                    <h2 style="margin-bottom: 1.5rem;">Cek Pesanan</h2>
+                    
+                    <div class="section">
+                        <h3><i class="fas fa-search"></i> Cari Pesanan</h3>
+                        <p style="margin-bottom: 1rem; color: #a5b4fc;">
+                            Masukkan ID pesanan untuk melihat detailnya. Sistem akan memvalidasi format ID menggunakan <strong style="color: #00f0ff;">FSA</strong>.
+                        </p>
+                        
+                        <div class="input-group">
+                            <input type="text" id="searchID" placeholder="Masukkan ID Pesanan (contoh: ORD-2024-0001)">
+                            <button class="btn btn-primary" onclick="checkOrder()">
+                                <i class="fas fa-search"></i> Cek
+                            </button>
+                        </div>
                     </div>
-                    <div id="riwayatLog" class="history-log"></div>
-                </div>
-
-                <!-- Statistics -->
-                <div class="info-section">
-                    <div class="section-header">
-                        <h3><i class="fas fa-chart-bar"></i> Statistik</h3>
-                    </div>
-                    <div id="statistik" class="stats-grid"></div>
+                    
+                    <div id="checkResult"></div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>Tugas UAS - Teori Bahasa dan Automata | Sistem Pemodelan Workflow E-commerce dengan FSA</p>
-        </div>
-    </footer>
-
-    <script type="module" src="src/app.js"></script>
+    <script>
+        // ========================================
+        // FSA IMPLEMENTATION (Background)
+        // ========================================
+        
+        const STATES = {
+            Q0: 'q0', Q1: 'q1', Q2: 'q2', Q3: 'q3', Q4: 'q4',
+            Q5: 'q5', Q6: 'q6', Q7: 'q7', Q8: 'q8', Q9: 'q9',
+            Q10: 'q10', Q11: 'q11', Q12: 'q12', Q13: 'q13',
+            REJECT: 'qreject'
+        };
+        
+        function isDigit(char) {
+            return char >= '0' && char <= '9';
+        }
+        
+        // FSA Validation Function
+        function validateOrderID(input) {
+            let currentState = STATES.Q0;
+            const steps = [];
+            
+            for (let i = 0; i < input.length; i++) {
+                const char = input[i];
+                const prevState = currentState;
+                
+                switch (currentState) {
+                    case STATES.Q0:
+                        currentState = (char === 'O') ? STATES.Q1 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "ID harus diawali dengan 'O'", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q1:
+                        currentState = (char === 'R') ? STATES.Q2 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Karakter kedua harus 'R'", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q2:
+                        currentState = (char === 'D') ? STATES.Q3 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Karakter ketiga harus 'D'", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q3:
+                        currentState = (char === '-') ? STATES.Q4 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Harus ada '-' setelah 'ORD'", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q4:
+                        currentState = isDigit(char) ? STATES.Q5 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Tahun harus 4 digit angka", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q5:
+                        currentState = isDigit(char) ? STATES.Q6 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Tahun harus 4 digit angka", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q6:
+                        currentState = isDigit(char) ? STATES.Q7 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Tahun harus 4 digit angka", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q7:
+                        currentState = isDigit(char) ? STATES.Q8 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Tahun harus 4 digit angka", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q8:
+                        currentState = (char === '-') ? STATES.Q9 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Harus ada '-' setelah tahun", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q9:
+                        currentState = isDigit(char) ? STATES.Q10 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Nomor urut harus 4 digit angka", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q10:
+                        currentState = isDigit(char) ? STATES.Q11 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Nomor urut harus 4 digit angka", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q11:
+                        currentState = isDigit(char) ? STATES.Q12 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Nomor urut harus 4 digit angka", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q12:
+                        currentState = isDigit(char) ? STATES.Q13 : STATES.REJECT;
+                        if (currentState === STATES.REJECT) {
+                            return { valid: false, error: "Nomor urut harus 4 digit angka", position: i + 1 };
+                        }
+                        break;
+                    
+                    case STATES.Q13:
+                        return { valid: false, error: "Format terlalu panjang. ID harus tepat 14 karakter", position: i + 1 };
+                    
+                    default:
+                        return { valid: false, error: "State tidak valid", position: i + 1 };
+                }
+                
+                steps.push({ state: prevState, input: char, next: currentState });
+            }
+            
+            if (currentState === STATES.Q13) {
+                return { valid: true, steps: steps };
+            } else {
+                return { valid: false, error: `Format tidak lengkap. State akhir: ${currentState}, harus mencapai q13` };
+            }
+        }
+        
+        // ========================================
+        // ORDER MANAGEMENT SYSTEM
+        // ========================================
+        
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        let orderCounter = parseInt(localStorage.getItem('orderCounter')) || 0;
+        
+        function generateOrderID() {
+            orderCounter++;
+            localStorage.setItem('orderCounter', orderCounter);
+            const year = new Date().getFullYear();
+            const number = String(orderCounter).padStart(4, '0');
+            const id = `ORD-${year}-${number}`;
+            
+            // Validasi dengan FSA (seharusnya selalu valid)
+            const validation = validateOrderID(id);
+            if (!validation.valid) {
+                console.error('Generated ID is invalid!', validation.error);
+                throw new Error('Generated ID is invalid! This should not happen.');
+            }
+            
+            return id;
+        }
+        
+        function createOrder() {
+            const customerName = document.getElementById('customerName').value.trim();
+            const productName = document.getElementById('productName').value.trim();
+            const quantity = parseInt(document.getElementById('quantity').value) || 1;
+            const price = parseInt(document.getElementById('price').value) || 0;
+            
+            if (!customerName || !productName) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Data Tidak Lengkap',
+                    text: 'Nama pelanggan dan produk harus diisi!',
+                    background: 'rgba(10, 14, 39, 0.95)',
+                    color: '#e0e7ff',
+                    confirmButtonColor: '#00f0ff'
+                });
+                return;
+            }
+            
+            if (price <= 0) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Harga Tidak Valid',
+                    text: 'Harga harus lebih dari 0!',
+                    background: 'rgba(10, 14, 39, 0.95)',
+                    color: '#e0e7ff',
+                    confirmButtonColor: '#00f0ff'
+                });
+                return;
+            }
+            
+            try {
+                const orderID = generateOrderID();
+                
+                const order = {
+                    id: orderID,
+                    customerName: customerName,
+                    productName: productName,
+                    quantity: quantity,
+                    price: price,
+                    total: quantity * price,
+                    date: new Date().toISOString(),
+                    status: 'Pending'
+                };
+                
+                orders.push(order);
+                localStorage.setItem('orders', JSON.stringify(orders));
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: '✅ Pesanan Berhasil Dibuat!',
+                    html: `
+                        <div style="text-align: left; padding: 1rem;">
+                            <p style="margin-bottom: 1rem;"><strong>ID Pesanan:</strong></p>
+                            <code style="background: rgba(0, 240, 255, 0.2); padding: 0.5rem 1rem; border-radius: 8px; display: block; margin-bottom: 1rem; color: #00f0ff; font-size: 1.2rem; text-align: center;">${orderID}</code>
+                            <p><strong>Pelanggan:</strong> ${customerName}</p>
+                            <p><strong>Produk:</strong> ${productName}</p>
+                            <p><strong>Jumlah:</strong> ${quantity} pcs</p>
+                            <p><strong>Total:</strong> <span style="color: #00ff9f; font-size: 1.2rem;">Rp ${order.total.toLocaleString('id-ID')}</span></p>
+                            <hr style="margin: 1rem 0; border-color: rgba(0, 240, 255, 0.3);">
+                            <p style="font-size: 0.9rem; color: #a5b4fc;"><i class="fas fa-shield-alt"></i> ID telah divalidasi dengan FSA dan format sudah benar.</p>
+                        </div>
+                    `,
+                    background: 'rgba(10, 14, 39, 0.95)',
+                    color: '#e0e7ff',
+                    confirmButtonColor: '#00f0ff',
+                    confirmButtonText: 'OK'
+                });
+                
+                // Reset form
+                document.getElementById('customerName').value = '';
+                document.getElementById('productName').value = '';
+                document.getElementById('quantity').value = '1';
+                document.getElementById('price').value = '';
+                
+                updateDashboard();
+                
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: error.message,
+                    background: 'rgba(10, 14, 39, 0.95)',
+                    color: '#e0e7ff',
+                    confirmButtonColor: '#ff006e'
+                });
+            }
+        }
+        
+        function checkOrder() {
+            const orderID = document.getElementById('searchID').value.trim();
+            const container = document.getElementById('checkResult');
+            
+            if (!orderID) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ID Kosong',
+                    text: 'Masukkan ID pesanan terlebih dahulu!',
+                    background: 'rgba(10, 14, 39, 0.95)',
+                    color: '#e0e7ff',
+                    confirmButtonColor: '#00f0ff'
+                });
+                return;
+            }
+            
+            // Validasi format ID dengan FSA terlebih dahulu
+            const validation = validateOrderID(orderID);
+            
+            if (!validation.valid) {
+                container.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h4 style="margin-bottom: 1rem;"><i class="fas fa-times-circle"></i> Format ID Tidak Valid</h4>
+                        <p><strong>Error:</strong> ${validation.error}</p>
+                        ${validation.position ? `<p><strong>Posisi Error:</strong> Karakter ke-${validation.position}</p>` : ''}
+                        <p style="margin-top: 1rem;"><strong>Format yang benar:</strong> <code style="background: rgba(0, 240, 255, 0.15); padding: 0.5rem 1rem; border-radius: 6px; color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.4); font-weight: bold; font-size: 1.1em;">ORD-XXXX-YYYY</code></p>
+                        <p><strong>Contoh:</strong> <code style="background: rgba(0, 240, 255, 0.15); padding: 0.35rem 0.75rem; border-radius: 6px; color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.4); font-weight: bold;">ORD-2024-0001</code></p>
+                        <p style="margin-top: 1rem; padding: 1rem; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); border-radius: 8px; color: #fca5a5;">
+                            <i class="fas fa-info-circle"></i> <strong style="color: #ef4444;">FSA Validation:</strong> Sistem menggunakan Finite State Automata untuk memvalidasi format ID. 
+                            ID yang Anda masukkan tidak sesuai dengan aturan FSA yang telah ditentukan.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Jika format valid, cari di database
+            const order = orders.find(o => o.id === orderID);
+            
+            if (!order) {
+                container.innerHTML = `
+                    <div class="alert alert-info">
+                        <h4 style="margin-bottom: 1rem;"><i class="fas fa-info-circle"></i> Pesanan Tidak Ditemukan</h4>
+                        <p><strong>ID:</strong> <code style="background: white; padding: 0.25rem 0.5rem; border-radius: 4px;">${orderID}</code></p>
+                        <p style="margin-top: 1rem;">Format ID sudah benar (tervalidasi oleh FSA), tetapi pesanan tidak ditemukan di database.</p>
+                        <p style="margin-top: 1rem; padding: 1rem; background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.4); border-radius: 8px; color: #93c5fd;">
+                            <i class="fas fa-check-circle"></i> <strong style="color: #60a5fa;">FSA Validation: PASS</strong><br>
+                            Format ID sesuai dengan aturan FSA (ORD-XXXX-YYYY)
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Tampilkan detail pesanan
+            container.innerHTML = `
+                <div class="alert alert-success">
+                    <h4 style="margin-bottom: 1rem;"><i class="fas fa-check-circle"></i> Pesanan Ditemukan</h4>
+                    <p style="margin-bottom: 1rem; padding: 1rem; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: 8px; color: #6ee7b7;">
+                        <i class="fas fa-shield-alt"></i> <strong style="color: #34d399;">FSA Validation: PASS</strong><br>
+                        Format ID telah divalidasi dan sesuai dengan aturan FSA
+                    </p>
+                </div>
+                
+                <div class="section">
+                    <h3><i class="fas fa-file-alt"></i> Detail Pesanan</h3>
+                    <div class="order-card">
+                        <div class="order-id">${order.id}</div>
+                        <div class="order-detail">
+                            <span><i class="fas fa-user"></i> Pelanggan:</span>
+                            <strong>${order.customerName}</strong>
+                        </div>
+                        <div class="order-detail">
+                            <span><i class="fas fa-box"></i> Produk:</span>
+                            <strong>${order.productName}</strong>
+                        </div>
+                        <div class="order-detail">
+                            <span><i class="fas fa-shopping-cart"></i> Jumlah:</span>
+                            <strong>${order.quantity} pcs</strong>
+                        </div>
+                        <div class="order-detail">
+                            <span><i class="fas fa-tag"></i> Harga Satuan:</span>
+                            <strong>Rp ${order.price.toLocaleString('id-ID')}</strong>
+                        </div>
+                        <div class="order-detail">
+                            <span><i class="fas fa-money-bill-wave"></i> Total:</span>
+                            <strong style="color: #28a745; font-size: 1.2rem;">Rp ${order.total.toLocaleString('id-ID')}</strong>
+                        </div>
+                        <div class="order-detail">
+                            <span><i class="fas fa-calendar"></i> Tanggal:</span>
+                            <strong>${new Date(order.date).toLocaleString('id-ID')}</strong>
+                        </div>
+                        <div class="order-detail">
+                            <span><i class="fas fa-info-circle"></i> Status:</span>
+                            <span class="order-status status-${order.status.toLowerCase()}">${order.status}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function updateOrderStatus(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (!order) return;
+            
+            const statusFlow = {
+                'Pending': 'Processing',
+                'Processing': 'Shipped',
+                'Shipped': 'Delivered',
+                'Delivered': 'Delivered'
+            };
+            
+            const nextStatus = statusFlow[order.status];
+            
+            if (order.status === 'Delivered') {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Pesanan Sudah Selesai',
+                    text: 'Pesanan ini sudah dalam status Delivered (Selesai)',
+                    background: 'rgba(10, 14, 39, 0.95)',
+                    color: '#e0e7ff',
+                    confirmButtonColor: '#00f0ff'
+                });
+                return;
+            }
+            
+            Swal.fire({
+                title: 'Update Status Pesanan',
+                html: `
+                    <div style="text-align: left;">
+                        <p><strong>ID:</strong> <code style="background: rgba(0, 240, 255, 0.15); padding: 0.35rem 0.75rem; border-radius: 6px; color: #00f0ff;">${orderId}</code></p>
+                        <p style="margin-top: 1rem;"><strong>Status Saat Ini:</strong> <span style="color: #fbbf24;">${order.status}</span></p>
+                        <p><strong>Status Baru:</strong> <span style="color: #00ff9f;">${nextStatus}</span></p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Update Status',
+                cancelButtonText: 'Batal',
+                background: 'rgba(10, 14, 39, 0.95)',
+                color: '#e0e7ff',
+                confirmButtonColor: '#00f0ff',
+                cancelButtonColor: '#ef4444'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    order.status = nextStatus;
+                    localStorage.setItem('orders', JSON.stringify(orders));
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Status Berhasil Diupdate!',
+                        text: `Status pesanan ${orderId} sekarang: ${nextStatus}`,
+                        background: 'rgba(10, 14, 39, 0.95)',
+                        color: '#e0e7ff',
+                        confirmButtonColor: '#00f0ff',
+                        timer: 2000
+                    });
+                    
+                    displayOrders();
+                    updateDashboard();
+                }
+            });
+        }
+        
+        function displayOrders() {
+            const container = document.getElementById('ordersList');
+            
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>Belum ada pesanan. Buat pesanan baru untuk memulai!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = orders.slice().reverse().map(order => `
+                <div class="order-card" onclick="updateOrderStatus('${order.id}')" style="cursor: pointer;">
+                    <div class="order-id">${order.id}</div>
+                    <div class="order-detail">
+                        <span><i class="fas fa-user"></i> Pelanggan:</span>
+                        <strong>${order.customerName}</strong>
+                    </div>
+                    <div class="order-detail">
+                        <span><i class="fas fa-box"></i> Produk:</span>
+                        <strong>${order.productName}</strong>
+                    </div>
+                    <div class="order-detail">
+                        <span><i class="fas fa-money-bill-wave"></i> Total:</span>
+                        <strong>Rp ${order.total.toLocaleString('id-ID')}</strong>
+                    </div>
+                    <div class="order-detail">
+                        <span><i class="fas fa-calendar"></i> Tanggal:</span>
+                        <strong>${new Date(order.date).toLocaleString('id-ID')}</strong>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                        <span class="order-status status-${order.status.toLowerCase()}">${order.status}</span>
+                        ${order.status !== 'Delivered' ? '<span style="color: #00f0ff; font-size: 0.85rem;"><i class="fas fa-hand-pointer"></i> Klik untuk update status</span>' : '<span style="color: #00ff9f; font-size: 0.85rem;"><i class="fas fa-check-circle"></i> Selesai</span>'}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function updateDashboard() {
+            document.getElementById('totalOrders').textContent = orders.length;
+            document.getElementById('pendingOrders').textContent = orders.filter(o => o.status === 'Pending').length;
+            document.getElementById('deliveredOrders').textContent = orders.filter(o => o.status === 'Delivered').length;
+        }
+        
+        function showAlert(containerId, type, message) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `<div class="alert alert-${type}">${message}</div>`;
+        }
+        
+        function showPage(pageName) {
+            // Update menu
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.menu-item').classList.add('active');
+            
+            // Update page
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageName).classList.add('active');
+            
+            // Refresh data if needed
+            if (pageName === 'orders') {
+                displayOrders();
+            } else if (pageName === 'dashboard') {
+                updateDashboard();
+            }
+        }
+        
+        // Initialize on load
+        window.onload = function() {
+            updateDashboard();
+            displayOrders();
+            
+            // Welcome message
+            setTimeout(() => {
+                Swal.fire({
+                    title: '🛒 Selamat Datang!',
+                    html: `
+                        <div style="text-align: left;">
+                            <p style="margin-bottom: 1rem;">Sistem E-commerce dengan <strong style="color: #00f0ff;">Finite State Automata (FSA)</strong></p>
+                            <hr style="margin: 1rem 0; border-color: rgba(0, 240, 255, 0.3);">
+                            <p style="font-size: 0.9rem; color: #a5b4fc;">
+                                <i class="fas fa-shield-alt"></i> FSA bekerja di background untuk memvalidasi setiap ID pesanan
+                            </p>
+                            <p style="font-size: 0.9rem; color: #a5b4fc; margin-top: 0.5rem;">
+                                <i class="fas fa-check-circle"></i> Format ID: <code>ORD-XXXX-YYYY</code>
+                            </p>
+                        </div>
+                    `,
+                    icon: 'info',
+                    background: 'rgba(10, 14, 39, 0.95)',
+                    color: '#e0e7ff',
+                    confirmButtonColor: '#00f0ff',
+                    confirmButtonText: 'Mulai',
+                    timer: 5000,
+                    timerProgressBar: true
+                });
+            }, 500);
+        };
+    </script>
 </body>
 </html>

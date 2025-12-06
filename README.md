@@ -1,130 +1,283 @@
-# 🛒 FSA E-commerce Simulator
+# 🛒 Sistem E-commerce dengan Validasi FSA
 
-Simulasi sistem pemesanan e-commerce menggunakan **Finite State Automata (FSA)** - Tugas UAS Teori Bahasa dan Automata.
+Implementasi Finite State Automata (FSA) untuk validasi format ID pesanan pada sistem e-commerce.
 
-## 🎯 Deskripsi
+---
 
-Aplikasi web interaktif yang mensimulasikan alur pemesanan e-commerce dari awal hingga selesai menggunakan konsep FSA. Setiap state dalam proses pemesanan dimodelkan sebagai state dalam automata, dengan transisi yang jelas antar state.
+## 📋 Deskripsi
 
-## ✨ Fitur
+Sistem e-commerce lengkap yang menggunakan **Finite State Automata (FSA)** di background untuk memvalidasi format ID pesanan secara otomatis. FSA bekerja sebagai komponen validasi yang memastikan setiap ID pesanan mengikuti format standar: `ORD-XXXX-YYYY`
 
-- ✅ **Simulasi FSA Real-time** - Visualisasi state dan transisi
-- 🎨 **UI Modern & Responsif** - Desain clean dengan animasi smooth
-- 📊 **State Diagram Interaktif** - Lihat posisi state saat ini
-- 🔄 **Validasi Transisi** - Hanya transisi valid yang bisa dijalankan
-- 📝 **History Log** - Tracking semua perubahan state
-- 🛡️ **Error Handling** - Validasi input dan state
+### 🎯 Fokus Utama: FSA di Background
 
-## 🏗️ Struktur FSA
+**User tidak perlu tahu ada FSA**, tapi setiap kali ada proses yang melibatkan ID pesanan (generate atau input), FSA akan bekerja untuk memvalidasi format.
 
-### States (Q)
-- `IDLE` - State awal
-- `BROWSING` - Melihat produk
-- `CART` - Keranjang belanja
-- `CHECKOUT` - Proses checkout
-- `PAYMENT` - Pembayaran
-- `PROCESSING` - Pemrosesan pesanan
-- `SHIPPED` - Pengiriman
-- `DELIVERED` - Terkirim (state akhir)
-- `CANCELLED` - Dibatalkan (state akhir)
+---
 
-### Transisi (δ)
-```
-IDLE → BROWSING (start_browsing)
-BROWSING → CART (add_to_cart)
-CART → CHECKOUT (proceed_checkout)
-CHECKOUT → PAYMENT (confirm_order)
-PAYMENT → PROCESSING (payment_success)
-PROCESSING → SHIPPED (ship_order)
-SHIPPED → DELIVERED (confirm_delivery)
-CART → BROWSING (continue_shopping)
-CHECKOUT → CART (back_to_cart)
-PAYMENT → CANCELLED (payment_failed)
-```
+## ✨ Fitur Sistem
 
-## 🚀 Cara Menjalankan
+### 1. Dashboard
+- Overview statistik pesanan dengan animasi
+- Informasi tentang sistem FSA
+- Format ID yang valid
+- **Desain:** Dark cyberpunk theme dengan neon effects
 
-### Online (Live Demo)
-Akses langsung di: **https://[username].github.io/fsa-ecommerce-simulator**
+### 2. Buat Pesanan
+- Form input data pesanan dengan validasi real-time
+- Generate ID otomatis (divalidasi FSA)
+- Simpan ke database lokal
+- **SweetAlert2** notification yang keren
 
-### Lokal
+### 3. Daftar Pesanan
+- List semua pesanan dengan hover effects
+- Informasi lengkap setiap pesanan
+- Status pesanan dengan color coding
+- **Animasi:** Smooth slide-in animations
 
-1. **Clone repository**
-   ```bash
-   git clone https://github.com/[username]/fsa-ecommerce-simulator.git
-   cd fsa-ecommerce-simulator
-   ```
+### 4. Cek Pesanan
+- Input ID pesanan dengan glow effects
+- **FSA validasi format** (FOKUS!)
+- Tampilkan detail jika valid
+- Error message jika invalid dengan SweetAlert2
+- **Visual feedback** untuk setiap validasi
 
-2. **Buka dengan browser**
-   - Double click file `index.html` di root folder
-   - Atau klik kanan → Open with → Browser pilihan lo
+---
 
-3. **Atau gunakan Live Server (VS Code)**
-   - Install extension "Live Server"
-   - Klik kanan `index.html` → Open with Live Server
+## 🔬 FSA Implementation
 
-## 📁 Struktur Project
+### Definisi Formal
 
 ```
-fsa-ecommerce-simulator/
-├── index.html              # UI utama (root untuk GitHub Pages)
-├── styles.css              # Styling (root untuk GitHub Pages)
-├── src/
-│   ├── core/
-│   │   ├── fsa.js          # Implementasi FSA
-│   │   └── orderStates.js  # Definisi states & transisi
-│   ├── utils/
-│   │   └── validator.js    # Validasi input
-│   └── app.js              # Main application logic
-├── public/                 # Backup original files
-│   ├── index.html
-│   └── styles.css
-├── LAPORAN-TUGAS-UAS.md    # Laporan lengkap
-└── README.md
+M = (Q, Σ, δ, q₀, F)
+
+Q  = {q0, q1, q2, ..., q13, qreject}  (15 states)
+Σ  = {O, R, D, -, 0-9}                (alfabet input)
+q₀ = q0                                (state awal)
+F  = {q13}                             (state accept)
+δ  = fungsi transisi (lihat folio)
 ```
 
-## 🎮 Cara Menggunakan
+### Format ID Valid
 
-1. **Start Browsing** - Mulai melihat produk
-2. **Add to Cart** - Tambahkan produk ke keranjang
-3. **Proceed to Checkout** - Lanjut ke checkout
-4. **Confirm Order** - Konfirmasi pesanan
-5. **Complete Payment** - Bayar pesanan
-6. **Track Shipping** - Lacak pengiriman
-7. **Confirm Delivery** - Konfirmasi penerimaan
+```
+ORD-XXXX-YYYY
 
-## 🧪 Testing
+Keterangan:
+- ORD  = Prefix wajib (3 huruf kapital)
+- -    = Separator
+- XXXX = 4 digit tahun (0-9)
+- -    = Separator
+- YYYY = 4 digit nomor urut (0-9)
+```
 
-Aplikasi sudah ditest dengan berbagai skenario:
-- ✅ Happy path (IDLE → DELIVERED)
-- ✅ Cancellation path (PAYMENT → CANCELLED)
-- ✅ Back navigation (CHECKOUT → CART → BROWSING)
-- ✅ Invalid transitions
-- ✅ Edge cases
+### Contoh
 
-## 📚 Teknologi
+✅ **Valid:**
+- `ORD-2024-0001`
+- `ORD-2025-9999`
+- `ORD-1999-0123`
 
-- **Vanilla JavaScript** (ES6+)
-- **HTML5**
-- **CSS3** (Flexbox, Grid, Animations)
-- **FSA Theory** (Teori Bahasa dan Automata)
+❌ **Invalid:**
+- `ORDER-2024-0001` (prefix salah)
+- `ORD-24-0001` (tahun kurang digit)
+- `ORD-2024-01` (nomor urut kurang digit)
+
+---
+
+## 🚀 Cara Menggunakan
+
+### Method 1: Buka Langsung di Browser
+
+1. **Download/Clone repository**
+2. **Buka file `index.html`** di browser
+3. **Mulai gunakan sistem!**
+
+### Method 2: Upload ke GitHub Pages
+
+1. **Buat repository di GitHub**
+2. **Upload file `index.html`**
+3. **Aktifkan GitHub Pages:**
+   - Settings → Pages
+   - Source: main branch, / (root)
+   - Save
+4. **Akses via link:** `https://[username].github.io/[repo-name]`
+
+---
+
+## 📖 Cara Pakai Sistem
+
+### 1. Dashboard
+- Lihat statistik pesanan
+- Baca informasi tentang FSA
+- Pahami format ID yang valid
+
+### 2. Buat Pesanan
+- Isi form: Nama pelanggan, produk, jumlah, harga
+- Klik "Buat Pesanan"
+- Sistem generate ID otomatis (FSA validasi di background)
+- ID disimpan ke database
+
+### 3. Daftar Pesanan
+- Lihat semua pesanan yang sudah dibuat
+- Setiap pesanan punya ID yang sudah tervalidasi FSA
+
+### 4. Cek Pesanan
+- Input ID pesanan
+- Klik "Cek"
+- **FSA validasi format** (INTI!)
+  - Jika format valid → cari di database → tampilkan detail
+  - Jika format invalid → tampilkan error + penjelasan
+- Lihat detail pesanan
+
+---
+
+## 🎓 Pembahasan (Folio)
+
+Lihat file `LAPORAN-FINAL-FSA.md` untuk pembahasan lengkap:
+
+### BAB 1: Pendahuluan
+- Latar belakang
+- Rumusan masalah
+- Tujuan & manfaat
+
+### BAB 2: Landasan Teori
+- Definisi FSA
+- Cara kerja FSA
+- Kompleksitas
+- Aplikasi FSA
+
+### BAB 3: Perancangan
+- Definisi formal FSA
+- Tabel transisi lengkap
+- Diagram state
+- Contoh trace eksekusi
+
+### BAB 4: Implementasi
+- Arsitektur sistem
+- Algoritma validasi
+- Kode implementasi
+- Integrasi FSA
+
+### BAB 5: Pengujian
+- Test case valid (10 contoh)
+- Test case invalid (15 contoh)
+- Analisis hasil (akurasi 100%)
+
+### BAB 6: Penutup
+- Kesimpulan
+- Saran
+
+---
+
+## 💡 Konsep: FSA di Background
+
+### Flow Sistem
+
+```
+User Action
+    ↓
+Application Logic
+    ↓
+⭐ FSA Validation (Background) ⭐
+    ↓
+Valid? 
+    ├─ Ya → Database → Response
+    └─ Tidak → Error Message
+```
+
+### Keuntungan
+
+- ✅ Invalid format langsung ditolak (hemat resource)
+- ✅ Tidak perlu query database untuk ID invalid
+- ✅ Feedback cepat ke user
+- ✅ Meningkatkan performa sistem
+- ✅ User tidak perlu tahu ada FSA
+
+---
+
+## 🔧 Teknologi
+
+- **HTML5** - Struktur
+- **CSS3** - Styling dengan animasi & transitions
+- **JavaScript (Vanilla)** - Logic & FSA
+- **localStorage** - Database lokal
+- **Font Awesome** - Icons
+- **SweetAlert2** - Beautiful notifications
+- **Dark Cyberpunk Theme** - Modern UI/UX
+- **Neon Effects** - Glow & pulse animations
+
+---
+
+## 📊 Kompleksitas
+
+### Waktu
+```
+O(n) dimana n = panjang string (maksimal 14 karakter)
+```
+
+### Ruang
+```
+O(1) - hanya menyimpan state saat ini
+```
+
+---
+
+## ✅ Kelebihan
+
+1. **Akurasi Tinggi:** 100% akurat dalam validasi format
+2. **Efisien:** Kompleksitas O(n), sangat cepat
+3. **Deterministik:** Hasil selalu konsisten
+4. **User-Friendly:** Error message yang jelas
+5. **Maintainable:** Kode terstruktur
+6. **Educational:** Menunjukkan aplikasi FSA nyata
+
+---
+
+## ⚠️ Keterbatasan
+
+1. **Format Terbatas:** Hanya 1 format (ORD-XXXX-YYYY)
+2. **Tidak Cek Semantik:** Tidak validasi tahun (misal: 9999)
+3. **Tidak Cek Database:** Tidak cek duplikasi ID
+4. **Case Sensitive:** Huruf kecil tidak diterima
+
+---
+
+## 🎯 Saran Pengembangan
+
+1. **Multi-Format:** Tambah format ID lain (CUST-XXXXX, PROD-XXX)
+2. **Semantic Validation:** Validasi tahun (1900-2100)
+3. **Case Insensitive:** Terima huruf kecil & auto-convert
+4. **Database Integration:** Cek duplikasi ID
+5. **Batch Validation:** Validasi banyak ID sekaligus
+
+---
+
+## 📚 Referensi
+
+Lihat `LAPORAN-FINAL-FSA.md` untuk daftar pustaka lengkap.
+
+---
 
 ## 👨‍💻 Author
 
-**[Nama Kamu]**
-- NIM: [NIM Kamu]
-- Mata Kuliah: Teori Bahasa dan Automata
-- Dosen: [Nama Dosen]
+**Nama:** [Nama Mahasiswa]  
+**NIM:** [NIM]  
+**Mata Kuliah:** Teori Bahasa dan Automata  
+**Dosen:** [Nama Dosen]
+
+---
 
 ## 📄 Lisensi
 
-Project ini dibuat untuk keperluan akademik - Tugas UAS TBA
+Project ini dibuat untuk keperluan akademik - Tugas UAS Teori Bahasa dan Automata.
+
+---
 
 ## 🙏 Acknowledgments
 
 - Terima kasih kepada Bapak/Ibu [Nama Dosen] atas bimbingannya
-- Referensi: Teori Bahasa dan Automata
+- Referensi: Buku-buku Automata Theory (lihat folio)
 
 ---
 
-⭐ **Star repo ini jika bermanfaat!**
+**⭐ Fokus Utama:** Implementasi FSA untuk validasi format ID pesanan, dimana FSA bekerja di background sebagai komponen validasi dalam sistem e-commerce.
